@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  todo-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: todo-user
+      POSTGRES_PASSWORD: todopassword
+      POSTGRES_DB: tododb
+    ports:
+      - "5432:5432"
+    volumes:
+      - todo-volume:/var/lib/postgresql/data
+
+volumes:
+  todo-volume:
