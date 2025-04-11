@@ -57,3 +57,51 @@ def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session
     db.commit()
     db.refresh(task)
     return {"message" : "Task updated successfully"}
+
+@app.post("/project" , response_model = schemas.ProjectInDB)
+
+def create_project(project : schemas.ProjectCreate , db : Session = Depends(get_db)) :
+    db_project = models.Project(name = project.name)
+    db.add(db_project)
+    db.commit()
+    db.refresh(db_project)
+    return db_project
+
+@app.get("/project" , response_model = list[schemas.ProjectInDB])
+
+def get_projects(db : Session = Depends(get_db)) :
+    projects = db.query(models.Project).all()
+    return projects
+
+@app.get("/project/{project_id}" , response_model = schemas.ProjectInDB)
+
+def get_project(project_id : int , db : Session = Depends(get_db)) :
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not project :
+        raise HTTPException(status_code = 404 , detail = "Project not found")
+    return project
+
+@app.delete("/project/{project_id}")
+
+def delete_project(project_id : int , db : Session = Depends(get_db)) :
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not project :
+        raise HTTPException(status_code = 404 , detail = "Project not found")
+    
+    db.delete(project)
+    db.commit()
+    return {"message" : "Project deleted successfully"}
+
+@app.put("/project/{project_id}")   
+
+def update_project(project_id : int , updated_project : schemas.ProjectBase , db : Session = Depends(get_db)) :
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not project :
+        raise HTTPException(status_code = 404 , detail = "Project not found")
+    
+    for key , value in updated_project.model_dump(exclude_unset=True).items() :
+        setattr(project , key , value)
+
+    db.commit()
+    db.refresh(project)
+    return {"message" : "Project updated successfully"}
