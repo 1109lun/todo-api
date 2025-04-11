@@ -1,8 +1,8 @@
-from pydantic import Basemodel
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date
 
-class TaskBase (Basemodel) :
+class TaskBase (BaseModel) :
     title : str
     description : Optional[str] = ""
     due_date : Optional[date] = None
@@ -22,7 +22,7 @@ class TaskInDB (TaskBase) :
     class Config :
         orm_mode = True
 
-class ProjectBase (Basemodel) :
+class ProjectBase (BaseModel) :
     name : str
 
 class ProjectCreate (ProjectBase) : 
