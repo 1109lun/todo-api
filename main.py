@@ -33,4 +33,14 @@ def get_tasks(project_id : int , db : Session = Depends(get_db)) :
         raise HTTPException(status_code = 404 , detail = "Project not found")
     return project.tasks
 
+@app.delete("/task/{task_id}")
+
+def delete_task(task_id : int , db : Session = Depends(get_db)) :
+    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not task :
+        raise HTTPException(status_code = 404 , detail = "Task not found")
+    
+    db.delete(task)
+    db.commit()
+    return {"message" : "Task deleted successfully"}
 
