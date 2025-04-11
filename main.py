@@ -44,3 +44,16 @@ def delete_task(task_id : int , db : Session = Depends(get_db)) :
     db.commit()
     return {"message" : "Task deleted successfully"}
 
+@app.put("/task/{task_id}")
+
+def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session = Depends(get_db)) :
+    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not task :
+        raise HTTPException(status_code = 404 , detail = "Task not found")
+    
+    for key , value in updated_task.model_dump(exclude_unset=True).items() :
+        setattr(task , key , value)
+
+    db.commit()
+    db.refresh(task)
+    return {"message" : "Task updated successfully"}
