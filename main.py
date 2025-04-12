@@ -1,5 +1,5 @@
 from database import SessionLocal
-from fastapi import FastAPI , HTTPException , Depends
+from fastapi import FastAPI , HTTPException , Depends , status
 from sqlalchemy.orm import Session
 import models , schemas
 
@@ -12,7 +12,7 @@ def get_db() :
     finally :
         db.close()
 
-@app.post("/tasks" , response_model = schemas.TaskInDB)
+@app.post("/tasks" , response_model = schemas.TaskInDB , status_code=status.HTTP_201_CREATED)
 
 def create_task(task : schemas.TaskCreate , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == task.project_id).first()
@@ -33,7 +33,7 @@ def get_tasks(project_id : int , db : Session = Depends(get_db)) :
         raise HTTPException(status_code = 404 , detail = "Project not found")
     return project.tasks
 
-@app.delete("/tasks/{task_id}")
+@app.delete("/tasks/{task_id}" , status_code=status.HTTP_204_NO_CONTENT)
 
 def delete_task(task_id : int , db : Session = Depends(get_db)) :
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -46,7 +46,7 @@ def delete_task(task_id : int , db : Session = Depends(get_db)) :
 
 @app.put("/tasks/{task_id}")
 
-def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session = Depends(get_db)) :
+def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session = Depends(get_db) ) :
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not task :
         raise HTTPException(status_code = 404 , detail = "Task not found")
@@ -58,7 +58,7 @@ def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session
     db.refresh(task)
     return {"message" : "Task updated successfully"}
 
-@app.post("/projects" , response_model = schemas.ProjectInDB)
+@app.post("/projects" , response_model = schemas.ProjectInDB , status_code=status.HTTP_201_CREATED)
 
 def create_project(project : schemas.ProjectCreate , db : Session = Depends(get_db)) :
     db_project = models.Project(name = project.name)
@@ -83,7 +83,7 @@ def get_project(project_id : int , db : Session = Depends(get_db)) :
 
 @app.delete("/projects/{project_id}")
 
-def delete_project(project_id : int , db : Session = Depends(get_db)) :
+def delete_project(project_id : int , db : Session = Depends(get_db) , status_code=status.HTTP_204_NO_CONTENT) :
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if not project :
         raise HTTPException(status_code = 404 , detail = "Project not found")
