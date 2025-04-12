@@ -12,7 +12,7 @@ def get_db() :
     finally :
         db.close()
 
-@app.post("/task" , response_model = schemas.TaskInDB)
+@app.post("/tasks" , response_model = schemas.TaskInDB)
 
 def create_task(task : schemas.TaskCreate , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == task.project_id).first()
@@ -25,7 +25,7 @@ def create_task(task : schemas.TaskCreate , db : Session = Depends(get_db)) :
     db.refresh(db_task)
     return db_task
 
-@app.get("/project/{project_id}/task" , response_model = list[schemas.TaskInDB])
+@app.get("/projects/{project_id}/tasks" , response_model = list[schemas.TaskInDB])
 
 def get_tasks(project_id : int , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
@@ -33,7 +33,7 @@ def get_tasks(project_id : int , db : Session = Depends(get_db)) :
         raise HTTPException(status_code = 404 , detail = "Project not found")
     return project.tasks
 
-@app.delete("/task/{task_id}")
+@app.delete("/tasks/{task_id}")
 
 def delete_task(task_id : int , db : Session = Depends(get_db)) :
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -44,7 +44,7 @@ def delete_task(task_id : int , db : Session = Depends(get_db)) :
     db.commit()
     return {"message" : "Task deleted successfully"}
 
-@app.put("/task/{task_id}")
+@app.put("/tasks/{task_id}")
 
 def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session = Depends(get_db)) :
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -58,7 +58,7 @@ def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session
     db.refresh(task)
     return {"message" : "Task updated successfully"}
 
-@app.post("/project" , response_model = schemas.ProjectInDB)
+@app.post("/projects" , response_model = schemas.ProjectInDB)
 
 def create_project(project : schemas.ProjectCreate , db : Session = Depends(get_db)) :
     db_project = models.Project(name = project.name)
@@ -73,7 +73,7 @@ def get_projects(db : Session = Depends(get_db)) :
     projects = db.query(models.Project).all()
     return projects
 
-@app.get("/project/{project_id}" , response_model = schemas.ProjectInDB)
+@app.get("/projects/{project_id}" , response_model = schemas.ProjectInDB)
 
 def get_project(project_id : int , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
@@ -81,7 +81,7 @@ def get_project(project_id : int , db : Session = Depends(get_db)) :
         raise HTTPException(status_code = 404 , detail = "Project not found")
     return project
 
-@app.delete("/project/{project_id}")
+@app.delete("/projects/{project_id}")
 
 def delete_project(project_id : int , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
@@ -92,8 +92,7 @@ def delete_project(project_id : int , db : Session = Depends(get_db)) :
     db.commit()
     return {"message" : "Project deleted successfully"}
 
-@app.put("/project/{project_id}")   
-
+@app.put("/projects/{project_id}")   
 def update_project(project_id : int , updated_project : schemas.ProjectBase , db : Session = Depends(get_db)) :
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if not project :
