@@ -30,6 +30,5 @@ class ProjectCreate (ProjectBase) :
 
 class ProjectInDB (ProjectBase) :
     id : int
-
-    class Config :
-        orm_mode = True
+    class Config:
+        from_attributes = True
