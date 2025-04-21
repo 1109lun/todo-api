@@ -11,9 +11,12 @@ class TaskBase (BaseModel) :
 
 class TaskCreate (TaskBase) :
     project_id : int
-
-class TaskUpdate (TaskBase) :
-    pass
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    due_date: Optional[date] = None
+    priority: Optional[str] = None
+    completed: Optional[bool] = None
 
 class TaskInDB (TaskBase) :
     id : int

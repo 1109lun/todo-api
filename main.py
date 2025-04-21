@@ -2,8 +2,17 @@ from database import SessionLocal
 from fastapi import FastAPI , HTTPException , Depends , status
 from sqlalchemy.orm import Session
 import models , schemas
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db() :
     db = SessionLocal()
@@ -44,19 +53,18 @@ def delete_task(task_id : int , db : Session = Depends(get_db)) :
     db.commit()
     return {"message" : "Task deleted successfully"}
 
-@app.put("/tasks/{task_id}")
-
-def update_task(task_id : int , updated_task : schemas.TaskUpdate , db : Session = Depends(get_db) ) :
+@app.patch("/tasks/{task_id}")
+def update_task(task_id: int, updated_task: schemas.TaskUpdate, db: Session = Depends(get_db)):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    if not task :
-        raise HTTPException(status_code = 404 , detail = "Task not found")
-    
-    for key , value in updated_task.model_dump(exclude_unset=True).items() :
-        setattr(task , key , value)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    for key, value in updated_task.model_dump(exclude_unset=True).items():
+        setattr(task, key, value)
 
     db.commit()
     db.refresh(task)
-    return {"message" : "Task updated successfully"}
+    return task
 
 @app.post("/projects" , response_model = schemas.ProjectInDB , status_code=status.HTTP_201_CREATED)
 
