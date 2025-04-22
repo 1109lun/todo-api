@@ -25,6 +25,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       DB_HOST: todo-db 
       DB_PORT: ${DB_PORT}
-
+    command: ./start.sh
+    
 volumes:
   todo-volume:
